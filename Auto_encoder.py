@@ -22,13 +22,15 @@ def model(X, w_h, w_o):
     h = tf.nn.tanh(tf.matmul(X, w_h))
     return tf.matmul(h, w_o)
 
+def pred(X,w_h):
+    return tf.matmul(X, w_h)
+
 # Optimisation step
 x = model(X, w_h, w_o)
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(x, Y))
 train_op = tf.train.GradientDescentOptimizer(0.1).minimize(cost)
-predict_op = tf.argmax(x, 1)
 
-batchsize = 256
+batchsize = 256 # We need not have a batch size as the data size is very less
 
 # Run the optimisation
 with tf.Session() as sess:
@@ -40,4 +42,6 @@ with tf.Session() as sess:
         for j in range(0,len(x_train),batchsize):
             last =  j + batchsize
             sess.run(train_op, feed_dict={X: x_train[j:j+batchsize], Y: x_train[j:j+batchsize]})
+
+    new_features = sess.run(pred,feed_dict={X: x_test[j:j+batchsize], w_h:sess.run(w_h)})
 
