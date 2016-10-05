@@ -5,8 +5,8 @@ import os
 
 # Variables
 size = 40,40
-path = '/Users/Hemanth/Documents/My UB/Deep learning /Project 1/Test'
-path_save = '/Users/Hemanth/Documents/My UB/Deep learning /Project 1/Modified Images'
+path = '/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/images/'
+path_save = '/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/imagesMod'
 
 
 # Reads all the files ending with .png and resizes them
@@ -24,5 +24,5 @@ for file in glob.glob(os.path.join(path, '*.png')):
 Final_array = np.array(image_array)
 np.save(path_save, np.array(image_array))
 
-B = np.load('/Users/Hemanth/Documents/My UB/Deep learning /Project 1/Modified images.npy')
+B = np.load('/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/imagesMod.npy')
 print(B.shape)
