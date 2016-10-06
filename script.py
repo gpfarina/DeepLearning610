@@ -21,10 +21,44 @@ def loadpngs():
         img.close()
     return((np.asarray(trainData), np.asarray(trainLabels)))
 
-def pcaRed(img):#redDim):
+def pcaRed(img):
     mu = np.mean(img, axis=0)
     pca = PCA()
     pca.fit(img)
-    #Xhat = (np.dot(pca.transform(img)[:,:redDim], pca.components_[:redDim,:]))+pca.mean_
-    return(pca)#,Xhat)
+    return(pca)
+
+def createPairs(k):
+    x,y=loadpngs()
+    perm1=np.random.permutation(range(k))
+    p1=x[perm1]
+    t1=y[perm1]
+    perm2=np.random.permutation(range(k))
+    p2=x[perm2]
+    t2=y[perm2]
+    return (((p1,t1),(p2,t2)))
     
+    
+def diff(img1, tag1, img2, tag2):
+    z=img1-img2
+    if (tag1==tag2):
+        tag=1
+    else:
+        tag=0
+    return(z,tag)
+
+def learn(zs):
+    pca=[]
+    for diff in zs:
+        pca.append(PCA().fit(diff.reshape(40,40)))
+    return(pca)
+
+def start(k):
+    (x1,t1),(x2,t2) = createPairs(k)
+    z=[]
+    t=[]
+    for i in range(len(x1)):
+        h,g = diff(x1[i],t1[i],x2[i],t2[i])
+        z.append(h)
+        t.append(g)       
+    pcas=np.asarray(learn(np.asarray(z)))
+    return(pcas,t)
