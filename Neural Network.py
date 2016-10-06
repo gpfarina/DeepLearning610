@@ -1,11 +1,14 @@
 import tensorflow as tf
 import numpy as np
-
-
+import script as sc
+k=1000
+pcas,t=sc.createPairs(k)
+x_train,y_train=???
 
 # Set up the model
-X = tf.placeholder('float', [None, 1600])
-Y = tf.placeholder('float', [None, 1600])
+X = tf.placeholder('float', [None, x_train[1].shape[1]])
+Y = tf.placeholder('float', [None, y_train[1].shape[1]])
+
 
 #initial value of weights
 
