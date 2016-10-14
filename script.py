@@ -49,7 +49,10 @@ def diff(img1, tag1, img2, tag2):
 def learn(zs):
     pca=[]
     for diff in zs:
-        pca.append(PCA().fit(diff.reshape(40,40)))
+        tmp=(PCA().fit(diff.reshape(40,40)).components_)
+        tmp=tmp[:,:25]
+        tmp=tmp.flatten()
+        pca.append(tmp)
     return(pca)
 
 def start(k):
@@ -61,4 +64,8 @@ def start(k):
         z.append(h)
         t.append(g)       
     pcas=np.asarray(learn(np.asarray(z)))
+    np.save('X_Data', pcas)
+    np.save('Y_Data', t)
     return(pcas,t)
+
+start(150)
