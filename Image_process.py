@@ -1,28 +1,34 @@
-from PIL import Image
 import numpy as np
 import glob
+from PIL import Image
 import os
 
-# Variables
+# Size of the image to which an image is compressed
 size = 40,40
-path = '/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/images/'
-path_save = '/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/imagesMod'
+path_save = '/Users/Hemanth/Documents/My UB/Deep learning /Project 1/Modified Images/'
 
+def Loadpngs():
+    trainData = []
+    trainLabels = []
 
-# Reads all the files ending with .png and resizes them
-image_array = []
-for file in glob.glob(os.path.join(path, '*.png')):
-    A = Image.open(file)
-    B = A.resize(size, Image.ANTIALIAS)
-    C = np.round(np.array(B) / 255)
-    image_array.append(C.flatten())
-    # Save the modified files
-    file_path = os.path.join(path_save, 'N' + os.path.basename(file))
-    B.save(file_path)
+    for filename in glob.glob('/Users/Hemanth/Documents/My UB/Deep learning /Project 1/Test/*.png'):
+        str = os.path.basename(filename)
+        tag = str.split('_')[0]
+        tag = int(''.join(i for i in tag if i.isdigit()))
+        img = Image.open(filename).convert('L')  # black and white
+        B = img.resize(size, Image.ANTIALIAS) # resize the image
+        file_path = os.path.join(path_save, 'N' + os.path.basename(filename))
+        B.save(file_path)
+        C = np.array(B)# convert to 1's and 0's (bit image)
+        C = C.flatten()
+        C = (C-min(C))/(max(C)-min(C))
+        arr = np.array(C)
+        trainData.append(arr)
+        trainLabels.append(tag)
+        img.close()
+    return ((np.array(trainData), np.array(trainLabels)))
 
-# Convert and save the image array
-Final_array = np.array(image_array)
-np.save(path_save, np.array(image_array))
+[X,Y] = Loadpngs()
 
-B = np.load('/home/gpietro/PhD/examsUB/610-DL/Handwritten-and-data/Cursive/imagesMod.npy')
-print(B.shape)
+np.save('X_Data',X)
+np.save('Y_Data',Y)
