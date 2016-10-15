@@ -67,7 +67,6 @@ def Model(x,W,b,dropout):
 
     # output
     output = tf.matmul(h1,W['fc2'])
-    print(output)
     return output
 
 # Create the weights (smart way of storing them in a dictionary, I like it!)
@@ -100,16 +99,13 @@ batchsize = 128 # We need not have a batch size as the data size is very less
 with tf.Session() as sess:
     tf.initialize_all_variables().run()
 
-    for i in range(50000):
+    for i in range(10000):
         p = np.random.permutation(range(len(x_train)))
         trX, trY = x_train[p], y_train[p]
         for j in range(0, len(x_train), batchsize):
             last = j + batchsize
             sess.run(train_op, feed_dict={X: trX[j:j + batchsize], Y: trY[j:j + batchsize]})
         if i%1000 == 0:
-            # can you figure out how to run our model for different input?
-
-        
-            # print(Model(x_test,sess.run(W),sess.run(b),0.4)) # This line is giving error
-            # # Predicted = np.round(Predicted)
-            # # print('Testing', np.mean(Predicted == y_test), sum(y_test) / len(y_test))
+            P = sess.run(Predicted, feed_dict={X:x_test})
+            P = np.round(P)
+            print('Testing', np.mean(P == y_test), sum(y_test) / len(y_test))
