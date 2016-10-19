@@ -18,7 +18,7 @@ x_train,x_test,y_train,y_test = train_test_split(X1,Y1,test_size=0.75,random_sta
 # Network parameters
 classes = 2
 neurons = 512
-features = 16
+features = 32
 dropout = 0.75
 kernel = 3
 
@@ -31,14 +31,18 @@ W = {
     # I am using a kernel size of 3,3 and output of
     'cv1': tf.Variable(tf.random_normal([kernel, kernel, 1, features])),
     'cv2': tf.Variable(tf.random_normal([kernel, kernel, features, features*2])),
+    'cv3': tf.Variable(tf.random_normal([kernel, kernel, features*2, features*4])),
+    'cv4': tf.Variable(tf.random_normal([kernel, kernel, features*4, features*8])),
     # Fully connected layer weights
-    'fc1': tf.Variable(tf.random_normal([10*10*features*2, neurons])),
+    'fc1': tf.Variable(tf.random_normal([5*5*features*8, neurons])),
     'fc2': tf.Variable(tf.random_normal([neurons, np.shape(y_train)[1]]))
 }
 
 b = {
     'bv1': tf.Variable(tf.random_normal([features])),
     'bv2': tf.Variable(tf.random_normal([features*2])),
+    'bv3': tf.Variable(tf.random_normal([features*4])),
+    'bv4': tf.Variable(tf.random_normal([features*8])),
     'bc1': tf.Variable(tf.random_normal([neurons])),
 }
 
@@ -61,6 +65,7 @@ def maxpool(x):
 def Model(x,W,b,dropout):
     # Reshape the vector into a matrix (original image)
     x = tf.reshape(x, shape=[-1, 40, 40, 1])
+    
     # Convolution Layer 1
     conv1 = conv(x, W['cv1'], b['bv1'])
     # Max Pooling (down-sampling)
@@ -70,10 +75,19 @@ def Model(x,W,b,dropout):
     conv2 = conv(mpool1, W['cv2'], b['bv2'])
     # Max Pooling (down-sampling)
     mpool2 = maxpool(conv2)
+    
+    # Convolution Layer 3
+    conv3 = conv(mpool2, W['cv3'], b['bv3'])
+    # Max Pooling (down-sampling)
+    mpool3 = maxpool(conv3)
+    
+    # Convolution Layer 4
+    conv4 = conv(mpool3, W['cv4'], b['bv4'])
+
 
     # Now the fully connected layer used for classification
     # flatten the mpool2 into a vector (remember it is a tensor now)
-    input = tf.reshape(mpool2, [-1, W['fc1'].get_shape().as_list()[0]])
+    input = tf.reshape(conv4, [-1, W['fc1'].get_shape().as_list()[0]])
     h1 = tf.add(tf.matmul(input,W['fc1']),b['bc1'])
     h1 = tf.nn.relu(h1) # can change to sigmoid
     # Before passing to output layer apply drop out

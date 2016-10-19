@@ -41,3 +41,5 @@ X_Train, Y_Train = X[p],Y[p]
 
 np.save('X_Train',X_Train)
 np.save('Y_Train',Y_Train)
+
+print(X.shape)
