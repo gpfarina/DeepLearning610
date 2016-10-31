@@ -17,10 +17,10 @@ x_train,x_test,y_train,y_test = train_test_split(X1,Y1,test_size=0.75,random_sta
 
 # Network parameters
 classes = 2
-neurons = 512
+neurons = 1024
 features = 32
-dropout = 0.75
-kernel = 3
+dropout = 0.83
+kernel = 5
 
 # Create the place holders for input and output
 X = tf.placeholder('float', [None, np.shape(x_train)[1]])
@@ -34,7 +34,7 @@ W = {
     'cv3': tf.Variable(tf.random_normal([kernel, kernel, features*2, features*4])),
     'cv4': tf.Variable(tf.random_normal([kernel, kernel, features*4, features*8])),
     # Fully connected layer weights
-    'fc1': tf.Variable(tf.random_normal([5*5*features*8, neurons])),
+    'fc1': tf.Variable(tf.random_normal([10*20*features*8, neurons])),
     'fc2': tf.Variable(tf.random_normal([neurons, np.shape(y_train)[1]]))
 }
 
@@ -74,10 +74,10 @@ def Model(x,W,b,dropout):
     # Convolution Layer 2
     conv2 = conv(mpool1, W['cv2'], b['bv2'])
     # Max Pooling (down-sampling)
-    mpool2 = maxpool(conv2)
+    # mpool2 = maxpool(conv2)
     
     # Convolution Layer 3
-    conv3 = conv(mpool2, W['cv3'], b['bv3'])
+    conv3 = conv(conv2, W['cv3'], b['bv3'])
     # Max Pooling (down-sampling)
     mpool3 = maxpool(conv3)
     
@@ -102,22 +102,22 @@ def Model(x,W,b,dropout):
 # Optimisation step
 M = Model(X,W,b,dropout)
 cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(M,Y))
-train_op = tf.train.AdagradOptimizer(0.01).minimize(cost)
+train_op = tf.train.AdagradOptimizer(0.05).minimize(cost)
 Predicted = tf.nn.sigmoid(Model(X,W,b,dropout))
 
-batchsize = 128 # We need not have a batch size as the data size is very less
+batchsize = 1000 # We need not have a batch size as the data size is very less
 
 # Run the optimisation
 with tf.Session() as sess:
     tf.initialize_all_variables().run()
 
-    for i in range(10000):
+    for i in range(50000):
         p = np.random.permutation(range(len(x_train)))
         trX, trY = x_train[p], y_train[p]
-        # for j in range(0, len(x_train), batchsize):
-        #     last = j + batchsize
-        sess.run(train_op, feed_dict={X: trX, Y: trY})
-        if i%1000 == 0:
+        for j in range(0, len(x_train), batchsize):
+            last = j + batchsize
+            sess.run(train_op, feed_dict={X: x_train, Y:y_train})
+        if i%100 == 0:
             P = sess.run(Predicted, feed_dict={X:x_test})
             P = np.round(P)
             print('Testing', np.mean(P == y_test), sum(y_test) / len(y_test))

@@ -13,6 +13,7 @@ YP = []
 XN = []
 YN = []
 
+
 for item in id:
     # Count the number of items in given class
     count = sum(Y==item)
@@ -24,15 +25,16 @@ for item in id:
     # Now get all the vectors using the above combination
     for ele in combin:
         # Positive examples
-        N = np.array(abs(xp[ele[0]]-xp[ele[1]]))
+        N = np.array(np.hstack((xp[ele[0]],xp[ele[1]])))
         # N = features(xp[ele[0]],xp[ele[1]])
         XP.append(N)
         YP.append(np.array([1]))
         # Negative examples
-        M = np.array(abs(xp[ele[0]]-xn[np.random.randint(xn.shape[0],size=1)[0]]))
+        M = np.array(np.hstack((xp[ele[0]],xn[np.random.randint(xn.shape[0],size=1)[0]])))
         # M = features(xp[ele[0]],xn[np.random.randint(xn.shape[0],size=1)[0]])
-        XN.append(np.array(M))
+        XN.append(M)
         YN.append(np.array([0]))
+
 
 X = np.vstack((XP,XN))
 Y = np.vstack((YP,YN))
